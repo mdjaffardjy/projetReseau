@@ -48,8 +48,8 @@ def clientthread(conn, addr):
 				message = conn.recv(2048) 
 				if message: 
 
-					"""prints the message and address of the 
-					user who just sent the message on the server 
+					"""prints :  message and address of the 
+					user who sent the message on the server 
 					terminal"""
 					print "<" + addr[0] + "> " + message 
 
@@ -65,8 +65,7 @@ def clientthread(conn, addr):
 			except: 
 				continue
 
-"""Using the below function, we broadcast the message to all 
-clients who's object is not the same as the one sending 
+"""Broadcast the message to all clients who's object is not the same as the one sending 
 the message """
 def broadcast(message, connection): 
 	for clients in list_of_clients: 
@@ -79,12 +78,15 @@ def broadcast(message, connection):
 				# if the link is broken, we remove the client 
 				remove(clients) 
 
-"""The following function simply removes the object 
-from the list that was created at the beginning of 
-the program"""
+"""removes the object that was created at the beginning of 
+the program from the list of clients"""
 def remove(connection): 
 	if connection in list_of_clients: 
 		list_of_clients.remove(connection) 
+
+"""sends a message when the server is in place"""
+print "Your server is up."
+
 
 while True: 
 
