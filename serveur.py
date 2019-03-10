@@ -80,7 +80,15 @@ def clientthread(conn, addr):
 						conn.send("Commande inconnue ou incomplete\n")
 					else :
 						if comm[0][1:]=='changernom' :
-							name=comm[1].rstrip("\n")
+							nv=comm[1].rstrip("\n")
+							while nv in liste_utilisateurs :
+								conn.send("Nom deja utilise\n")
+								conn.send("Choissisez un nom :\n")
+								nv=conn.recv(2048)[:-1]
+							liste_utilisateurs.remove(name)
+							liste_utilisateurs.append(nv)
+							broadcast(name+" a change son nom en "+nv, conn, chan)
+							name=nv
 						elif comm[0][1:]=='changersalon' :
 							if comm[1].rstrip("\n") in list_of_clients.keys() :
 								changerchan(conn, name, chan, comm[1].rstrip("\n"))
