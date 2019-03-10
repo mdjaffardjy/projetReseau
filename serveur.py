@@ -89,24 +89,24 @@ def clientthread(conn, addr):
 								changerchan(conn, name, chan, comm[1].rstrip("\n"))
 								chan=comm[1].rstrip("\n")
 
-							elif comm[0][1:]=='listeutilisateurs\n' :
-								for u in liste_utilisateurs :
-									conn.send(u+"\n")
-					else :
-					# Calls broadcast function to send message to all 
-						message_to_send = "<" + name + "> " + message 
-						broadcast(message_to_send, conn, chan) 
-						if(len(list_of_conversations[chan])==20):
-							list_of_conversations[chan].popleft()
-						list_of_conversations[chan].extend("<" + addr[0] + "> " + message)
+						elif comm[0][1:]=='listeutilisateurs\n' :
+							for u in liste_utilisateurs :
+								conn.send(u+"\n")
+				else :
+				# Calls broadcast function to send message to all 
+					message_to_send = "<" + name + "> " + message 
+					broadcast(message_to_send, conn, chan) 
+					if(len(list_of_conversations[chan])==20):
+						list_of_conversations[chan].popleft()
+					list_of_conversations[chan].extend("<" + addr[0] + "> " + message)
 
-				else: 
-					#remove connection when it's broken
-					remove(conn, chan) 
-					broadcast(name+" a quitte le salon", conn, chan)
-					break
-			except: 
-				continue
+			else: 
+				#remove connection when it's broken
+				remove(conn, chan) 
+				broadcast(name+" a quitte le salon", conn, chan)
+				break
+		except: 
+			continue
 
 #Broadcast the message to all clients except the one who sent the message
 def broadcast(message, connection, chan): 
