@@ -29,25 +29,27 @@ list_of_clients = {'Hub' : [], 'Blabla' : []}
 liste_utilisateurs=[]
 
 liste_commandes = ['changernom', 'changersalon', 'historique\n', 'creersalon', 'listeutilisateurs\n']
+#list of the the list of the last messages for all conversations. We keep a maximum of 20 messages
+list_of_conversations = {'Hub' : deque([], 20), 'Blabla' : deque([], 20)} 
+
 
 def changerchan(conn, name, ancien, nouveau) :
 	remove(conn, ancien)
 	list_of_clients[nouveau].append(conn)
 	conn.send("Bienvenue dans "+nouveau+'\n')
+	for message in list_of_conversations[chan]:
+	  print (message+"/n")
+	  broadcast (message+"/n")
 	broadcast(name+" est entre dans le salon", conn, nouveau)
 
 def afficherhistorique(conn) :
 	conn.send("pas d'historique lol\n")
 
-#list of the last messages for a conversation. We keep maximum 20 messages
-conversation = deque([], 20)
-
 def clientthread(conn, addr): 
 	name=addr[0]
 
 	# sends a message to the client whose user object is connected
-	conn.send("Bienvenue dans le Hub !\n") 
-	conn.send("Choissisez un salon : \n")
+	conn.send("Bienvenue dans le Hub !\n Choissisez un salon : \n")
 	liste_chan=''
 	for s in list_of_clients.keys() :
 		liste_chan+=s+';'
@@ -59,7 +61,7 @@ def clientthread(conn, addr):
 		conn.send(liste_chan)
 		chan=conn.recv(2048)[:-1]
 	
-	changerchan(conn, name, 'Hub', chan)
+  changerchan(conn, name, 'Hub', chan)
 	
 	
 	while True: 
@@ -94,6 +96,9 @@ def clientthread(conn, addr):
 					# Calls broadcast function to send message to all 
 						message_to_send = "<" + name + "> " + message 
 						broadcast(message_to_send, conn, chan) 
+						if(len(list_of_conversations[chan])==20):
+					    list_of_conversations[chan].popleft()
+					  list_of_conversations[chan].extend("<" + addr[0] + "> " + message)
 
 				else: 
 					#remove connection when it's broken
