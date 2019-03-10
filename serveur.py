@@ -26,7 +26,19 @@ server.listen(100)
 
 list_of_clients = {'Hub' : [], 'Blabla' : []}
 
+liste_commandes = ['changernom', 'changersalon', 'historique\n', 'creersalon']
+
+def changerchan(conn, name, ancien, nouveau) :
+	remove(conn, ancien)
+	list_of_clients[nouveau].append(conn)
+	conn.send("Bienvenue dans "+nouveau+'\n')
+	broadcast(name+" est entre dans le salon", conn, nouveau)
+
+def afficherhistorique(conn) :
+	conn.send("pas d'historique lol\n")
+
 def clientthread(conn, addr): 
+	name=addr[0]
 
 	# sends a message to the client whose user object is connected
 	conn.send("Bienvenue dans le Hub !\n") 
@@ -42,10 +54,7 @@ def clientthread(conn, addr):
 		conn.send(liste_chan)
 		chan=conn.recv(2048)[:-1]
 	
-	remove(conn, 'Hub')
-	list_of_clients[chan].append(conn)
-	conn.send("Bienvenue dans "+chan+'\n')
-	broadcast(addr[0]+" est entre dans le salon", conn, chan)
+	changerchan(conn, name, 'Hub', chan)
 	
 	
 	while True: 
@@ -53,16 +62,36 @@ def clientthread(conn, addr):
 				message = conn.recv(2048) 
 				if message: 
 		  #prints on the terminal :  message and address of the user
-					print("<" + addr[0] + "> " + message) 
-
+					print("<" + name + "> " + message) 
+					if message.startswith('/') :
+						comm=message.split(' ')
+						if comm[0][1:] not in liste_commandes :
+							conn.send("Commande inconnue ou incomplete\n")
+						else :
+							if comm[0][1:]=='changernom' :
+								name=comm[1].rstrip("\n")
+							elif comm[0][1:]=='changersalon' :
+								if comm[1].rstrip("\n") in list_of_clients.keys() :
+									changerchan(conn, name, chan, comm[1].rstrip("\n"))
+									chan=comm[1].rstrip("\n")
+								else :
+									conn.send('Salon inexistant\n')
+							elif comm[0][1:]=='historique\n' :
+								afficherhistorique(conn)
+							elif comm[0][1:]=='creersalon' :
+								list_of_clients[comm[1].rstrip("\n")]=[]
+								changerchan(conn, name, chan, comm[1].rstrip("\n"))
+								chan=comm[1].rstrip("\n")
+							
+					else :
 					# Calls broadcast function to send message to all 
-					message_to_send = "<" + addr[0] + "> " + message 
-					broadcast(message_to_send, conn, chan) 
+						message_to_send = "<" + name + "> " + message 
+						broadcast(message_to_send, conn, chan) 
 
 				else: 
 					#remove connection when it's broken
 					remove(conn, chan) 
-					broadcast(addr[0]+" a quitte le salon", conn, chan)
+					broadcast(name+" a quitte le salon", conn, chan)
 					break
 			except: 
 				continue
