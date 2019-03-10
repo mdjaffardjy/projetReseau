@@ -28,11 +28,18 @@ list_of_clients = {'Hub' : [], 'Blabla' : []}
 
 def clientthread(conn, addr): 
 
+<<<<<<< HEAD
+	# sends a message to the client whose user object is conn 
+	conn.send("Welcome to this chatroom!") 
+
+while True: 
+=======
 	# sends a message to the client whose user object is connected
 	conn.send("Bienvenue dans le Hub !") 
 	conn.send("Choissisez un salon : ")
 	conn.send(s for s in list_of_clients.keys())
 	while True: 
+>>>>>>> refs/remotes/origin/master
 			try: 
 				message = conn.recv(2048) 
 				if message: 
