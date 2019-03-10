@@ -10,7 +10,7 @@ server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
 # checks whether IP address and port number have been provided 
 if len(sys.argv) != 3: 
-	print("Entrez : script, addresse IP, numero de port")
+	print("Entrez : script, addresse IP, numéro de port")
 	exit() 
 
 
@@ -26,14 +26,13 @@ server.listen(100)
 
 list_of_clients = {'Hub' : [], 'Blabla' : []}
 
-#list of the last messages for a conversation. We keep maximum 20 messages
-conversation = deque([], 20)
+#list of the the list of the last messages for all conversations. We keep a maximum of 20 messages
+list_of_conversations = {'Hub' : deque([], 20), 'Blabla' : deque([], 20)} 
 
 def clientthread(conn, addr): 
 
 	# sends a message to the client whose user object is connected
-	conn.send("Bienvenue dans le Hub !\n") 
-	conn.send("Choissisez un salon : \n")
+	conn.send("Bienvenue dans le Hub !\n Choissisez un salon : \n")
 	liste_chan=''
 	for s in list_of_clients.keys() :
 		liste_chan+=s+';'
@@ -48,7 +47,9 @@ def clientthread(conn, addr):
 	remove(conn, 'Hub')
 	list_of_clients[chan].append(conn)
 	conn.send("Bienvenue dans "+chan+'\n')
-	broadcast(addr[0]+" est entre dans le salon", conn, chan)
+	for message in list_of_conversations[chan]:
+	  print (message+"/n")
+	broadcast(addr[0]+" est entré dans le salon", conn, chan)
 	
 	
 	while True: 
@@ -57,6 +58,9 @@ def clientthread(conn, addr):
 				if message: 
 		  #prints on the terminal :  message and address of the user
 					print("<" + addr[0] + "> " + message) 
+					if(len(list_of_conversations[chan])==20):
+					  list_of_conversations[chan].popleft()
+					list_of_conversations[chan].extend("<" + addr[0] + "> " + message)
 
 					# Calls broadcast function to send message to all 
 					message_to_send = "<" + addr[0] + "> " + message 
