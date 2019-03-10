@@ -5,7 +5,7 @@ import sys
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
 if len(sys.argv) != 3: 
-	print("Entrez : script, addresse IP, numéro de port")
+	print("Entrez : script, addresse IP, numero de port")
 	exit() 
 IP_address = str(sys.argv[1]) 
 Port = int(sys.argv[2]) 

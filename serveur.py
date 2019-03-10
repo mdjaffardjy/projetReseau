@@ -2,7 +2,7 @@
 import socket 
 import select 
 import sys 
-from _thread import *
+from thread import *
 
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
@@ -10,7 +10,7 @@ server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
 # checks whether IP address and port number have been provided 
 if len(sys.argv) != 3: 
-	print("Entrez : script, addresse IP, numéro de port")
+	print("Entrez : script, addresse IP, numero de port")
 	exit() 
 
 
@@ -24,13 +24,14 @@ server.bind((IP_address, Port))
 #listens for "100" active connections
 server.listen(100) 
 
-list_of_clients = [] 
+list_of_clients = {'Hub' : [], 'Blabla' : []}
 
 def clientthread(conn, addr): 
 
 	# sends a message to the client whose user object is connected
-	conn.send("Bienvenue dans le salon !") 
-
+	conn.send("Bienvenue dans le Hub !") 
+	conn.send("Choissisez un salon : ")
+	conn.send(s for s in list_of_clients.keys())
 	while True: 
 			try: 
 				message = conn.recv(2048) 
@@ -68,7 +69,7 @@ def remove(connection):
 		list_of_clients.remove(connection) 
 
 #Sends a message when the server is in place
-print "Your server is up."
+print("Your server is up.")
 
 
 while True: 
@@ -78,7 +79,7 @@ while True:
 	conn, addr = server.accept() 
 
 	"""Maintains a list of clients in the chatroom"""
-	list_of_clients.append(conn) 
+	list_of_clients['Hub'].append(conn) 
 
 	# prints the address of the user that just connected 
 	print(addr[0] + " connected")
