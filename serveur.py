@@ -53,7 +53,7 @@ def clientthread(conn, addr):
 	liste_utilisateurs.append(name)
 	
 	# sends a message to the client whose user object is connected
-	conn.send("Bienvenue dans le Hub !\n Choissisez un salon : \n")
+	conn.send("Bienvenue dans le Hub !\nChoissisez un salon : \n")
 	liste_chan=''
 	for s in list_of_clients.keys() :
 		liste_chan+=s+';'
