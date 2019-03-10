@@ -28,7 +28,7 @@ list_of_clients = {'Hub' : [], 'Blabla' : []}
 
 liste_utilisateurs=[]
 
-liste_commandes = ['changernom', 'changersalon', 'historique\n', 'creersalon', 'listeutilisateurs\n']
+liste_commandes = ['changernom', 'changersalon', 'creersalon', 'listeutilisateurs\n']
 #list of the the list of the last messages for all conversations. We keep a maximum of 20 messages
 list_of_conversations = {'Hub' : deque([], 20), 'Blabla' : deque([], 20)} 
 
@@ -40,9 +40,6 @@ def changerchan(conn, name, ancien, nouveau) :
 	for message in list_of_conversations[nouveau]: #displays the last 20 messages
 		conn.send(message+"\n")
 	broadcast(name+" est entre dans le salon", conn, nouveau)
-
-def afficherhistorique(conn) :
-	conn.send("pas d'historique lol\n")
 
 def clientthread(conn, addr): 
 	name=addr[0]
@@ -56,7 +53,7 @@ def clientthread(conn, addr):
 	liste_utilisateurs.append(name)
 	
 	# sends a message to the client whose user object is connected
-	conn.send("Bienvenue dans le Hub !\n Choissisez un salon : \n")
+	conn.send("Bienvenue dans le Hub !\nChoissisez un salon : \n")
 	liste_chan=''
 	for s in list_of_clients.keys() :
 		liste_chan+=s+';'
@@ -83,7 +80,14 @@ def clientthread(conn, addr):
 						conn.send("Commande inconnue ou incomplete\n")
 					else :
 						if comm[0][1:]=='changernom' :
-							name=comm[1].rstrip("\n")
+							nv=comm[1].rstrip("\n")
+							if nv not in liste_utilisateurs :
+								liste_utilisateurs.remove(name)
+								liste_utilisateurs.append(nv)
+								broadcast(name+" a change son nom en "+nv, conn, chan)
+								name=nv
+							else :
+								conn.send("Nom deja utilise\n")
 						elif comm[0][1:]=='changersalon' :
 							if comm[1].rstrip("\n") in list_of_clients.keys() :
 								changerchan(conn, name, chan, comm[1].rstrip("\n"))
