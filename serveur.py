@@ -37,8 +37,8 @@ def changerchan(conn, name, ancien, nouveau) :
 	remove(conn, ancien)
 	list_of_clients[nouveau].append(conn)
 	conn.send("Bienvenue dans "+nouveau+'\n')
-	for message in list_of_conversations[nouveau]:
-	  conn.send(message+"\n")
+	for message in list_of_conversations[nouveau]: #displays the last 20 messages
+		conn.send(message+"\n")
 	broadcast(name+" est entre dans le salon", conn, nouveau)
 
 def afficherhistorique(conn) :
@@ -93,12 +93,13 @@ def clientthread(conn, addr):
 							for u in liste_utilisateurs :
 								conn.send(u+"\n")
 				else :
-				# Calls broadcast function to send message to all 
+				# Calls broadcast function to send message to all and saves the message in the list
 					message_to_send = "<" + name + "> " + message 
 					broadcast(message_to_send, conn, chan) 
 					if(len(list_of_conversations[chan])==20):
 						list_of_conversations[chan].popleft()
-					list_of_conversations[chan].extend("<" + addr[0] + "> " + message)
+					msg = "<" + name + "> " + message
+					list_of_conversations[chan].append(msg)
 
 			else: 
 				#remove connection when it's broken
