@@ -64,38 +64,31 @@ def clientthread(conn, addr):
 	
 	chan=conn.recv(2048)[:-1]
 	while chan not in list_of_clients.keys() :
-		conn.send("Salon inexistant\nChoissisez un salon : \n")
+		conn.send("Salon inexistant\nChoisissez un salon : \n")
 		conn.send(liste_chan)
 		chan=conn.recv(2048)[:-1]
 
 	changerchan(conn, name, 'Hub', chan)
   
-  
+
 	while True: 
-			try: 
-				message = conn.recv(2048) 
-				if message: 
+		try: 
+			message = conn.recv(2048) 
+			if message: 
 		  #prints on the terminal :  message and address of the user
-					print("<" + name + "> " + message) 
-					if message.startswith('/') :
-						comm=message.split(' ')
-						if comm[0][1:] not in liste_commandes :
-							conn.send("Commande inconnue ou incomplete\n")
-						else :
-							if comm[0][1:]=='changernom' :
-								name=comm[1].rstrip("\n")
-							elif comm[0][1:]=='changersalon' :
-								if comm[1].rstrip("\n") in list_of_clients.keys() :
-									changerchan(conn, name, chan, comm[1].rstrip("\n"))
-									chan=comm[1].rstrip("\n")
-								else :
-									conn.send('Salon inexistant\n')
-							elif comm[0][1:]=='historique\n' :
-								afficherhistorique(conn)
-							elif comm[0][1:]=='creersalon' :
-								list_of_clients[comm[1].rstrip("\n")]=[]
+				print("<" + name + "> " + message) 
+				if message.startswith('/') :
+					comm=message.split(' ')
+					if comm[0][1:] not in liste_commandes :
+						conn.send("Commande inconnue ou incomplete\n")
+					else :
+						if comm[0][1:]=='changernom' :
+							name=comm[1].rstrip("\n")
+						elif comm[0][1:]=='changersalon' :
+							if comm[1].rstrip("\n") in list_of_clients.keys() :
 								changerchan(conn, name, chan, comm[1].rstrip("\n"))
 								chan=comm[1].rstrip("\n")
+
 							elif comm[0][1:]=='listeutilisateurs\n' :
 								for u in liste_utilisateurs :
 									conn.send(u+"\n")
