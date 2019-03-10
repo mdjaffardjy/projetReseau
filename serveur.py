@@ -60,49 +60,47 @@ def clientthread(conn, addr):
 		chan=conn.recv(2048)[:-1]
 	
   changerchan(conn, name, 'Hub', chan)
-	
-	
 	while True: 
-			try: 
-				message = conn.recv(2048) 
-				if message: 
+		try: 
+			message = conn.recv(2048) 
+			if message: 
 		  #prints on the terminal :  message and address of the user
-					print("<" + name + "> " + message) 
-					if message.startswith('/') :
-						comm=message.split(' ')
-						if comm[0][1:] not in liste_commandes :
-							conn.send("Commande inconnue ou incomplete\n")
-						else :
-							if comm[0][1:]=='changernom' :
-								name=comm[1].rstrip("\n")
-							elif comm[0][1:]=='changersalon' :
-								if comm[1].rstrip("\n") in list_of_clients.keys() :
-									changerchan(conn, name, chan, comm[1].rstrip("\n"))
-									chan=comm[1].rstrip("\n")
-								else :
-									conn.send('Salon inexistant\n')
-							elif comm[0][1:]=='historique\n' :
-								afficherhistorique(conn)
-							elif comm[0][1:]=='creersalon' :
-								list_of_clients[comm[1].rstrip("\n")]=[]
+				print("<" + name + "> " + message) 
+				if message.startswith('/') :
+					comm=message.split(' ')
+					if comm[0][1:] not in liste_commandes :
+						conn.send("Commande inconnue ou incomplete\n")
+					else :
+						if comm[0][1:]=='changernom' :
+							name=comm[1].rstrip("\n")
+						elif comm[0][1:]=='changersalon' :
+							if comm[1].rstrip("\n") in list_of_clients.keys() :
 								changerchan(conn, name, chan, comm[1].rstrip("\n"))
 								chan=comm[1].rstrip("\n")
-							
-					else :
-					# Calls broadcast function to send message to all 
-						message_to_send = "<" + name + "> " + message 
-						broadcast(message_to_send, conn, chan) 
-						if(len(list_of_conversations[chan])==20):
-					    list_of_conversations[chan].popleft()
-					  list_of_conversations[chan].extend("<" + addr[0] + "> " + message)
+							else :
+								conn.send('Salon inexistant\n')
+						elif comm[0][1:]=='historique\n' :
+							afficherhistorique(conn)
+						elif comm[0][1:]=='creersalon' :
+							list_of_clients[comm[1].rstrip("\n")]=[]
+							changerchan(conn, name, chan, comm[1].rstrip("\n"))
+							chan=comm[1].rstrip("\n")
+						
+				else :
+				# Calls broadcast function to send message to all 
+					message_to_send = "<" + name + "> " + message 
+					broadcast(message_to_send, conn, chan) 
+					if(len(list_of_conversations[chan])==20):
+				    list_of_conversations[chan].popleft()
+				  list_of_conversations[chan].extend("<" + addr[0] + "> " + message)
 
-				else: 
-					#remove connection when it's broken
-					remove(conn, chan) 
-					broadcast(name+" a quitte le salon", conn, chan)
-					break
-			except: 
-				continue
+			else: 
+				#remove connection when it's broken
+				remove(conn, chan) 
+				broadcast(name+" a quitte le salon", conn, chan)
+				break
+		except: 
+			continue
 
 #Broadcast the message to all clients except the one who sent the message
 def broadcast(message, connection, chan): 
