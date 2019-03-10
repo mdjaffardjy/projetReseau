@@ -43,7 +43,7 @@ def clientthread(conn, addr):
 	# sends a message to the client whose user object is conn 
 	conn.send("Welcome to this chatroom!") 
 
-	while True: 
+while True: 
 			try: 
 				message = conn.recv(2048) 
 				if message: 
