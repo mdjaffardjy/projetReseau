@@ -26,7 +26,9 @@ server.listen(100)
 
 list_of_clients = {'Hub' : [], 'Blabla' : []}
 
-liste_commandes = ['changernom', 'changersalon', 'historique\n', 'creersalon']
+liste_utilisateurs=[]
+
+liste_commandes = ['changernom', 'changersalon', 'historique\n', 'creersalon', 'listeutilisateurs\n']
 
 def changerchan(conn, name, ancien, nouveau) :
 	remove(conn, ancien)
@@ -85,7 +87,9 @@ def clientthread(conn, addr):
 								list_of_clients[comm[1].rstrip("\n")]=[]
 								changerchan(conn, name, chan, comm[1].rstrip("\n"))
 								chan=comm[1].rstrip("\n")
-							
+							elif comm[0][1:]=='listeutilisateurs\n' :
+								for u in liste_utilisateurs :
+									conn.send(u+"\n")
 					else :
 					# Calls broadcast function to send message to all 
 						message_to_send = "<" + name + "> " + message 
