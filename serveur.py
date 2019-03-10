@@ -10,7 +10,7 @@ server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
 # checks whether IP address and port number have been provided 
 if len(sys.argv) != 3: 
-	print("Entrez : script, addresse IP, numéro de port")
+	print("Entrez : script, addresse IP, numero de port")
 	exit() 
 
 
@@ -35,6 +35,9 @@ def changerchan(conn, name, ancien, nouveau) :
 	remove(conn, ancien)
 	list_of_clients[nouveau].append(conn)
 	conn.send("Bienvenue dans "+nouveau+'\n')
+	for message in list_of_conversations[chan]:
+	  print (message+"/n")
+	  broadcast (message+"/n")
 	broadcast(name+" est entre dans le salon", conn, nouveau)
 
 def afficherhistorique(conn) :
@@ -56,16 +59,7 @@ def clientthread(conn, addr):
 		conn.send(liste_chan)
 		chan=conn.recv(2048)[:-1]
 	
-<<<<<<< HEAD
-	remove(conn, 'Hub')
-	list_of_clients[chan].append(conn)
-	conn.send("Bienvenue dans "+chan+'\n')
-	for message in list_of_conversations[chan]:
-	  print (message+"/n")
-	broadcast(addr[0]+" est entré dans le salon", conn, chan)
-=======
-	changerchan(conn, name, 'Hub', chan)
->>>>>>> 79e3cf32e210dace282fc2e83f1607adb58fb642
+  changerchan(conn, name, 'Hub', chan)
 	
 	
 	while True: 
@@ -73,13 +67,6 @@ def clientthread(conn, addr):
 				message = conn.recv(2048) 
 				if message: 
 		  #prints on the terminal :  message and address of the user
-<<<<<<< HEAD
-					print("<" + addr[0] + "> " + message) 
-					if(len(list_of_conversations[chan])==20):
-					  list_of_conversations[chan].popleft()
-					list_of_conversations[chan].extend("<" + addr[0] + "> " + message)
-
-=======
 					print("<" + name + "> " + message) 
 					if message.startswith('/') :
 						comm=message.split(' ')
@@ -102,10 +89,12 @@ def clientthread(conn, addr):
 								chan=comm[1].rstrip("\n")
 							
 					else :
->>>>>>> 79e3cf32e210dace282fc2e83f1607adb58fb642
 					# Calls broadcast function to send message to all 
 						message_to_send = "<" + name + "> " + message 
 						broadcast(message_to_send, conn, chan) 
+						if(len(list_of_conversations[chan])==20):
+					    list_of_conversations[chan].popleft()
+					  list_of_conversations[chan].extend("<" + addr[0] + "> " + message)
 
 				else: 
 					#remove connection when it's broken
