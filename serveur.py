@@ -37,9 +37,8 @@ def changerchan(conn, name, ancien, nouveau) :
 	remove(conn, ancien)
 	list_of_clients[nouveau].append(conn)
 	conn.send("Bienvenue dans "+nouveau+'\n')
-	for message in list_of_conversations[chan]:
-	  print (message+"/n")
-	  broadcast (message+"/n")
+	for message in list_of_conversations[nouveau]:
+	  conn.send(message+"\n")
 	broadcast(name+" est entre dans le salon", conn, nouveau)
 
 def afficherhistorique(conn) :
@@ -47,7 +46,15 @@ def afficherhistorique(conn) :
 
 def clientthread(conn, addr): 
 	name=addr[0]
-
+	conn.send("Choissisez un nom :\n")
+	name=conn.recv(2048)[:-1]
+	while name in liste_utilisateurs :
+		conn.send("Nom deja utilise\n")
+		conn.send("Choissisez un nom :\n")
+		name=conn.recv(2048)[:-1]
+		
+	liste_utilisateurs.append(name)
+	
 	# sends a message to the client whose user object is connected
 	conn.send("Bienvenue dans le Hub !\n Choissisez un salon : \n")
 	liste_chan=''
@@ -57,13 +64,13 @@ def clientthread(conn, addr):
 	
 	chan=conn.recv(2048)[:-1]
 	while chan not in list_of_clients.keys() :
-		conn.send("Salon inexsitant\n""Choissisez un salon : \n")
+		conn.send("Salon inexistant\nChoissisez un salon : \n")
 		conn.send(liste_chan)
 		chan=conn.recv(2048)[:-1]
-	
-  changerchan(conn, name, 'Hub', chan)
-	
-	
+
+	changerchan(conn, name, 'Hub', chan)
+  
+  
 	while True: 
 			try: 
 				message = conn.recv(2048) 
@@ -97,8 +104,8 @@ def clientthread(conn, addr):
 						message_to_send = "<" + name + "> " + message 
 						broadcast(message_to_send, conn, chan) 
 						if(len(list_of_conversations[chan])==20):
-					    list_of_conversations[chan].popleft()
-					  list_of_conversations[chan].extend("<" + addr[0] + "> " + message)
+							list_of_conversations[chan].popleft()
+						list_of_conversations[chan].extend("<" + addr[0] + "> " + message)
 
 				else: 
 					#remove connection when it's broken
