@@ -26,10 +26,12 @@ server.listen(100)
 
 list_of_clients = {'Hub' : [], 'Blabla' : []}
 
+liste_utilisateurs=[]
+
+liste_commandes = ['changernom', 'changersalon', 'historique\n', 'creersalon', 'listeutilisateurs\n']
 #list of the the list of the last messages for all conversations. We keep a maximum of 20 messages
 list_of_conversations = {'Hub' : deque([], 20), 'Blabla' : deque([], 20)} 
 
-liste_commandes = ['changernom', 'changersalon', 'historique\n', 'creersalon']
 
 def changerchan(conn, name, ancien, nouveau) :
 	remove(conn, ancien)
@@ -77,30 +79,25 @@ def clientthread(conn, addr):
 							if comm[1].rstrip("\n") in list_of_clients.keys() :
 								changerchan(conn, name, chan, comm[1].rstrip("\n"))
 								chan=comm[1].rstrip("\n")
-							else :
-								conn.send('Salon inexistant\n')
-						elif comm[0][1:]=='historique\n' :
-							afficherhistorique(conn)
-						elif comm[0][1:]=='creersalon' :
-							list_of_clients[comm[1].rstrip("\n")]=[]
-							changerchan(conn, name, chan, comm[1].rstrip("\n"))
-							chan=comm[1].rstrip("\n")
-						
-				else :
-				# Calls broadcast function to send message to all 
-					message_to_send = "<" + name + "> " + message 
-					broadcast(message_to_send, conn, chan) 
-					if(len(list_of_conversations[chan])==20):
-				    list_of_conversations[chan].popleft()
-				  list_of_conversations[chan].extend("<" + addr[0] + "> " + message)
 
-			else: 
-				#remove connection when it's broken
-				remove(conn, chan) 
-				broadcast(name+" a quitte le salon", conn, chan)
-				break
-		except: 
-			continue
+							elif comm[0][1:]=='listeutilisateurs\n' :
+								for u in liste_utilisateurs :
+									conn.send(u+"\n")
+					else :
+					# Calls broadcast function to send message to all 
+						message_to_send = "<" + name + "> " + message 
+						broadcast(message_to_send, conn, chan) 
+						if(len(list_of_conversations[chan])==20):
+					    list_of_conversations[chan].popleft()
+					  list_of_conversations[chan].extend("<" + addr[0] + "> " + message)
+
+				else: 
+					#remove connection when it's broken
+					remove(conn, chan) 
+					broadcast(name+" a quitte le salon", conn, chan)
+					break
+			except: 
+				continue
 
 #Broadcast the message to all clients except the one who sent the message
 def broadcast(message, connection, chan): 
