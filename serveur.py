@@ -3,7 +3,7 @@ import socket
 import select 
 import sys 
 from thread import *
-
+from collections import deque
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
 server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) 
@@ -36,6 +36,9 @@ def changerchan(conn, name, ancien, nouveau) :
 
 def afficherhistorique(conn) :
 	conn.send("pas d'historique lol\n")
+
+#list of the last messages for a conversation. We keep maximum 20 messages
+conversation = deque([], 20)
 
 def clientthread(conn, addr): 
 	name=addr[0]
