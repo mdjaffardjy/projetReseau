@@ -28,7 +28,7 @@ list_of_clients = {'Hub' : [], 'Blabla' : []}
 
 liste_utilisateurs=[]
 
-liste_commandes = ['changernom', 'changersalon', 'historique\n', 'creersalon', 'listeutilisateurs\n']
+liste_commandes = ['changernom', 'changersalon', 'creersalon', 'listeutilisateurs\n']
 #list of the the list of the last messages for all conversations. We keep a maximum of 20 messages
 list_of_conversations = {'Hub' : deque([], 20), 'Blabla' : deque([], 20)} 
 
@@ -40,9 +40,6 @@ def changerchan(conn, name, ancien, nouveau) :
 	for message in list_of_conversations[nouveau]:
 	  conn.send(message+"\n")
 	broadcast(name+" est entre dans le salon", conn, nouveau)
-
-def afficherhistorique(conn) :
-	conn.send("pas d'historique lol\n")
 
 def clientthread(conn, addr): 
 	name=addr[0]
