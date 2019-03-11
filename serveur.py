@@ -139,8 +139,18 @@ def broadcast(message, connection, chan):
 
 #removes the client from the list of clients
 def remove(connection, chan): 
-	if connection in list_of_clients[chan]: 
-		list_of_clients[chan].remove(connection) 
+  if connection in list_of_clients[chan]: 
+    list_of_clients[chan].remove(connection) 
+
+# removes the client from the list of clients and the list of users
+# To use for users leaving the server
+def remove_from_server(connection, chan, name): 
+  #Changer la fonction ci-dessous pour quitter le serveur au lieu du salon 
+  # Bon courage
+  #if connection in list_of_clients[chan]: 
+  #  list_of_clients[chan].remove(connection) 
+  if name in liste_utilisateurs:
+    liste_utilisateurs.remove(name)
 
 #Sends a message when the server is in place
 print("Your server is up.")
