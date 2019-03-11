@@ -41,6 +41,13 @@ def changerchan(conn, name, ancien, nouveau) :
 		conn.send(message+"\n")
 	broadcast(name+" est entre dans le salon", conn, nouveau)
 
+def connected_users(liste_utilisateurs):
+  res =""
+  for s in liste_utilisateurs:
+	  res = res +" - " + s
+  res=res+" sont actuellement connectes\n"
+  return res
+
 def clientthread(conn, addr): 
 	name=addr[0]
 	conn.send("Choissisez un nom :\n")
@@ -51,12 +58,14 @@ def clientthread(conn, addr):
 		name=conn.recv(2048)[:-1]
 		
 	liste_utilisateurs.append(name)
+	liste_utilisateurs.sort()
+	
 	
 # Infos sur les utilisateurs du reseau 
 	
 	# sends a message to the client whose user object is connected
 
-	conn.send("Bienvenue dans le Hub !\nIl y a actuellement " + str(len(liste_utilisateurs)) + " utilisateurs connectes. \nChoissisez un salon : \n")
+	conn.send("Bienvenue dans le Hub !\nIl y a actuellement " + str(len(liste_utilisateurs)) + " utilisateurs connecte(s) : \n"+ connected_users(liste_utilisateurs) + "\nChoissisez un salon : \n")
 	liste_chan=''
 	for s in list_of_clients.keys() :
 		liste_chan+=s+';'
