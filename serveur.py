@@ -44,7 +44,7 @@ def changerchan(conn, name, ancien, nouveau) :
 def connected_users(liste_utilisateurs):
   res =""
   for s in liste_utilisateurs:
-	  res = res +" - " + s
+	  res = res +" - " + s + "\n"
   res=res+" sont actuellement connectes\n"
   return res
 
@@ -58,7 +58,7 @@ def clientthread(conn, addr):
 		name=conn.recv(2048)[:-1]
 		
 	liste_utilisateurs.append(name)
-	liste_utilisateurs.sort()
+	liste_utilisateurs.sort() 
 	
 	
 # Infos sur les utilisateurs du reseau 
