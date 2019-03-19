@@ -52,7 +52,7 @@ Then, you can chose a room in which you wish to enter (amongst the rooms in the 
 WARNING : No special command can be used before this step.
 
 ##### Special commands
-* ``` @<name> <message>``` : send a private message to <name>, if <name> is connected to the server under this name. 
+* ``` @<name> <message>``` : send a private message to *<name>*, if *<name>* is connected to the server under this name. 
 Example : ``` @Riri Hello ! ```
 * ``` /changernom <nom> ``` : enables to change the user's own name. Warning : no space allowed ; no already used name can be taken.
 Example : ``` /changernom Fifi ```

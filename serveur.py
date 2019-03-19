@@ -28,7 +28,7 @@ list_of_clients = {'Hub' : [], 'Blabla' : []}
 
 liste_utilisateurs=[]
 
-liste_commandes = ['changernom', 'changersalon', 'creersalon', 'listeutilisateurs\n']
+liste_commandes = ['changernom', 'changersalon', 'creersalon', 'listeutilisateurs\n', 'help\n']
 #list of the the list of the last messages for all conversations. We keep a maximum of 20 messages
 list_of_conversations = {'Hub' : deque([], 20), 'Blabla' : deque([], 20)} 
 
@@ -108,6 +108,8 @@ def clientthread(conn, addr):
 						elif comm[0][1:]=='listeutilisateurs\n' :
 							for u in liste_utilisateurs :
 								conn.send(u+"\n")
+						elif comm[0][1:]=='help\n' :
+							conn.send("Bienvenue dans l'aide du chat. Ici, tu peux naviguer dans plusieurs salons et discuter avec les personnes connectees a ce serveur.\n\nListe des commandes disponibles :\n-/changernom <nom> : permet de changer de nom dans le serveur\n-/changersalon <nom_du_salon> : permet de se deplacer dans le salon choisi\n-listeutilisateurs : permet d'obtenir les noms des utilisateurs connectes\n-help\n\nPour plus de details sur l'utilisation, veuillez vous referer au README.md\n")
 				else :
 				# Calls broadcast function to send message to all and saves the message in the list
 					message_to_send = "<" + name + "> " + message 
