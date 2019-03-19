@@ -27,7 +27,7 @@ Language of the server : french
 
 First, install the server using the following command in the computer terminal :
 ```python
-python server.py <localhost> <port>
+python server.py <IP_address> <port>
 ```
 For example : ```python python serveur.py 127.0.0.1 8888```
 
@@ -37,7 +37,7 @@ For example : ```python python serveur.py 127.0.0.1 8888```
 
 Once the server is set, users that want to connect to the server should use the following command (can be written in a new terminal window or in a separate computer terminal window):
 ```python
-python client.py <localhost> <port>
+python client.py <IP_address> <port>
 ```
 > Be aware that the users connect to the same localhost and port as the ones of the server !
 > If the client is correctly connected, you will see a written confirmation in the terminal : "Choisissez un nom".
@@ -60,13 +60,8 @@ Example : ``` /changernom Fifi ```
 Example : ``` /changersalon Hub ```
 * ``` /listeutilisateurs ``` : print the list of connected users in the terminal window.
 
-## Description of the software
-This software is composed of two files (serveur.py and client.py)
-### Serveur.py
-#### Methods
+## Tests
 
-### Client.py
-#### Methods
 
 ## Authors
 
