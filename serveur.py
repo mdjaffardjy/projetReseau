@@ -1,7 +1,8 @@
 # Python program to implement server side of chat room. 
 import socket 
 import select 
-import sys 
+import sys
+import errno 
 from thread import *
 from collections import deque
 
@@ -122,8 +123,18 @@ def clientthread(conn, addr):
 				remove_from_server(conn, chan, name) 
 				broadcast(name+" a quitte le salon", conn, chan)
 				break
-		except: 
-			continue
+		except socket.error, e:
+		  if isinstance(e.args, tuple):
+		    print "errno is %d" %e[0]
+		    if e[0] == errno.EPIPE:
+		    #remote peer disconnected
+		      print "Detected connection disconnect"
+		    else:
+		      pass
+		  else:
+		    print "socket error", e
+		  conn.close()
+		  break
 
 #Broadcast the message to all clients except the one who sent the message
 def broadcast(message, connection, chan): 
