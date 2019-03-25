@@ -119,7 +119,7 @@ def clientthread(conn, addr):
 
 			else: 
 				#remove connection when it's broken
-				remove(conn, chan) 
+				remove_from_server(conn, chan, name) 
 				broadcast(name+" a quitte le salon", conn, chan)
 				break
 		except: 
@@ -135,9 +135,9 @@ def broadcast(message, connection, chan):
 				clients.close() 
 
 				# if the link is broken, we remove the client 
-				remove(clients) 
+				remove(clients)
 
-#removes the client from the list of clients
+#removes the client from the list of clients (in a specific room)
 def remove(connection, chan): 
   if connection in list_of_clients[chan]: 
     list_of_clients[chan].remove(connection) 
@@ -145,10 +145,8 @@ def remove(connection, chan):
 # removes the client from the list of clients and the list of users
 # To use for users leaving the server
 def remove_from_server(connection, chan, name): 
-  #Changer la fonction ci-dessous pour quitter le serveur au lieu du salon 
-  # Bon courage
-  #if connection in list_of_clients[chan]: 
-  #  list_of_clients[chan].remove(connection) 
+  if connection in list_of_clients[chan]: 
+    list_of_clients[chan].remove(connection) 
   if name in liste_utilisateurs:
     liste_utilisateurs.remove(name)
 
