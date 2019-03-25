@@ -104,10 +104,8 @@ def clientthread(conn, addr):
 							if comm[1].rstrip("\n") in list_of_clients.keys() :
 								changerchan(conn, name, chan, comm[1].rstrip("\n"))
 								chan=comm[1].rstrip("\n")
-
 						elif comm[0][1:]=='listeutilisateurs\n' :
-							for u in liste_utilisateurs :
-								conn.send(u+"\n")
+							conn.send(connected_users(liste_utilisateurs))
 						elif comm[0][1:]=='help\n' :
 							conn.send("Bienvenue dans l'aide du chat. Ici, tu peux naviguer dans plusieurs salons et discuter avec les personnes connectees a ce serveur.\n\nListe des commandes disponibles :\n-/changernom <nom> : permet de changer de nom dans le serveur\n-/changersalon <nom_du_salon> : permet de se deplacer dans le salon choisi\n-listeutilisateurs : permet d'obtenir les noms des utilisateurs connectes\n-help\n\nPour plus de details sur l'utilisation, veuillez vous referer au README.md\n")
 				else :
