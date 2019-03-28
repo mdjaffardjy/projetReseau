@@ -2,7 +2,7 @@
 
   This chat-room server is composed of multiple rooms. A user can chat with other users that are present in the same room, using the computer terminal.
   
-  The user can navigate in the different rooms and create new ones using commands, and can send private messages to all users connected to the server.
+  The user can browse different rooms and create new ones using commands, and can send private messages to all users connected to the server.
    
 ### Included
 
@@ -23,7 +23,7 @@ Libraries that need to be installed are :
 
 Language of the server : french
 
-## Installing
+## Installing / Tests
 
 First, install the server using the following command in the computer terminal :
 ```python
@@ -52,22 +52,29 @@ Then, you can chose a room in which you wish to enter (amongst the rooms in the 
 WARNING : No special command can be used before this step.
 
 ##### Special commands
-* ``` @<name> <message>``` : send a private message to *<name>*, if *<name>* is connected to the server under this name. 
-Example : ``` @Riri Hello ! ```
-* ``` /changernom <nom> ``` : enables to change the user's own name. Warning : no space allowed ; no already used name can be taken.
-Example : ``` /changernom Fifi ```
-* ``` /changersalon <name_of_room> ``` : enables to change room amongst existing rooms.
-Example : ``` /changersalon Hub ```
-* ``` /listeutilisateurs ``` : print the list of connected users in the terminal window.
+* ``` /changernom <nom> ``` : enables to change the user's own name. Warning : no space allowed ; no already used name can be taken (except if the user using this name left the server).
 
-## Tests
+Example : ``` /changernom Fifi ```
+
+* ``` /changersalon <name_of_room> ``` : enables to change room amongst existing rooms.
+
+Example : ``` /changersalon Hub ```
+
+* ``` /creersalon <name_of_new_room> ``` : create a new chat room named after *name_of_room*. No space allowed. Two chat rooms cannot have the same name.
+
+Example : ``` /creersalon Forum ```
+
+* ``` /listeutilisateurs ``` : prints the list of connected users in the terminal window.
+
+* ``` /help ``` : provide help on how to use the server and commands
+
+* ``` /exit ``` : enables an user to leave the server properly. Type ``` y ``` if you are sure to leave. ``` n ``` enables to come back to server.
 
 
 ## Authors
+* **Olivia Brunet** - *Initial work* - [GitHub](https://github.com/OliviaBnt)
 
 * **Marine Djaffardjy** - *Initial work* - [GitHub](https://github.com/mdjaffardjy)
-
-* **Olivia Brunet** - *Initial work* - [GitHub](https://github.com/OliviaBnt)
 
 * **Théophile Moreal de Brevans** - *Initial work* - [GitHub](https://github.com/MorealDeBrevans/)
 
