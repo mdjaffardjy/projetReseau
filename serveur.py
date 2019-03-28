@@ -42,7 +42,7 @@ def changerchan(conn, name, ancien, nouveau) :
 		conn.send(message+"\n")
 	broadcast(name+" est entre dans le salon", conn, nouveau)
 
-def connected_users(liste_utilisateurs):
+def connected_users():
   res =""
   for s in liste_utilisateurs:
 	  res = res +" - " + s + "\n"
@@ -66,7 +66,7 @@ def clientthread(conn, addr):
 	
 	# sends a message to the client whose user object is connected
 
-	conn.send("Bienvenue dans le Hub !\nIl y a actuellement " + str(len(liste_utilisateurs)) + " utilisateurs connecte(s) : \n"+ connected_users(liste_utilisateurs) + "\nChoissisez un salon : \n")
+	conn.send("Bienvenue dans le Hub !\nIl y a actuellement " + str(len(liste_utilisateurs)) + " utilisateurs connecte(s) : \n"+ connected_users() + "\nChoissisez un salon : \n")
 	liste_chan=''
 	for s in list_of_clients.keys() :
 		liste_chan+=s+';'
@@ -105,8 +105,13 @@ def clientthread(conn, addr):
 							if comm[1].rstrip("\n") in list_of_clients.keys() :
 								changerchan(conn, name, chan, comm[1].rstrip("\n"))
 								chan=comm[1].rstrip("\n")
+						elif comm[0][1:]=='creersalon' :
+							list_of_clients[comm[1][:-1]]=[]
+							list_of_conversations[comm[1][:-1]]=deque([],20)
+							changerchan(conn,name,chan,comm[1][:-1])
+							chan=comm[1][:-1]
 						elif comm[0][1:]=='listeutilisateurs\n' :
-							conn.send(connected_users(liste_utilisateurs))
+							conn.send(connected_users())
 						elif comm[0][1:]=='help\n' :
 							conn.send("Bienvenue dans l'aide du chat. Ici, tu peux naviguer dans plusieurs salons et discuter avec les personnes connectees a ce serveur.\n\nListe des commandes disponibles :\n-/changernom <nom> : permet de changer de nom dans le serveur\n-/changersalon <nom_du_salon> : permet de se deplacer dans le salon choisi\n-listeutilisateurs : permet d'obtenir les noms des utilisateurs connectes\n-help\n\nPour plus de details sur l'utilisation, veuillez vous referer au README.md\n")
 						elif comm[0][1:]=='exit\n' :
