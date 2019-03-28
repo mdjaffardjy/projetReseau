@@ -12,31 +12,49 @@ import errno
 from thread import *
 from collections import deque
 
-# -*- main code -*-
+
+# ************************* -*- main code -*- *********************************
+
 # uses AF_INET domain and TCP protocol
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
 server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) 
 
 # checks whether IP address and port number have been provided 
 """ 
+****************************
 sys.argv[0] = file name
 sys.argv[1] = IP address
 sys.argv[2] = port number
+****************************
 """
 if len(sys.argv) != 3: 
 	print("Entrez : script, addresse IP, numero de port")
 	exit() 
 
 
-IP_address = str(sys.argv[1]) 
+IP_address = str(sys.argv[1]) #sets IP address
  
-Port = int(sys.argv[2]) 
+Port = int(sys.argv[2]) #sets port number
 
 #The client must be aware of the IP address and port number parameters 
 server.bind((IP_address, Port)) 
 
 #listens for "100" active connections
 server.listen(100) 
+
+# Global variables
+""" 
+    ****************************************************
+ * list_of_clients : map of connections per room. 
+       --- key : name of room ; 
+       --- value : list of connections
+ * liste_utilisateurs : list of connected user's names. 
+ * liste_commandes : list of special commands
+ * list_of_conversations : map of messages per room. 
+       --- key : name of room
+       --- value : deque of a list of messages and size
+    ****************************************************
+"""
 
 list_of_clients = {'Hub' : [], 'Blabla' : []}
 
@@ -46,6 +64,18 @@ liste_commandes = ['changernom', 'changersalon', 'creersalon', 'listeutilisateur
 #list of the the list of the last messages for all conversations. We keep a maximum of 20 messages
 list_of_conversations = {'Hub' : deque([], 20), 'Blabla' : deque([], 20)} 
 
+
+#Broadcast the message to all clients except the one who sent the message
+def broadcast(message, connection, chan): 
+	for clients in list_of_clients[chan]: 
+		if clients!=connection: 
+			try: 
+				clients.send(message) 
+			except: 
+				clients.close() 
+
+				# if the link is broken, we remove the client 
+				remove(clients)
 
 def changerchan(conn, name, ancien, nouveau) :
 	remove(conn, ancien)
@@ -61,6 +91,19 @@ def connected_users():
 	  res = res +" - " + s + "\n"
   res=res+" sont actuellement connectes\n"
   return res
+  
+#removes the client from the list of clients (in a specific room)
+def remove(connection, chan): 
+  if connection in list_of_clients[chan]: 
+    list_of_clients[chan].remove(connection) 
+
+# removes the client from the list of clients and the list of users
+# To use for users leaving the server
+def remove_from_server(connection, chan, name): 
+  if connection in list_of_clients[chan]: 
+    list_of_clients[chan].remove(connection) 
+  if name in liste_utilisateurs:
+    liste_utilisateurs.remove(name)
 
 def clientthread(conn, addr): 
 	name=addr[0]
@@ -152,7 +195,6 @@ def clientthread(conn, addr):
 				#remove connection when it's broken
 				remove_from_server(conn, chan, name) 
 				broadcast(name+" a quitte le salon", conn, chan)
-				liste_utilisateurs.remove(name)
 				break
 		except socket.error, e:
 		  if isinstance(e.args, tuple):
@@ -167,30 +209,6 @@ def clientthread(conn, addr):
 		  conn.close()
 		  break
 
-#Broadcast the message to all clients except the one who sent the message
-def broadcast(message, connection, chan): 
-	for clients in list_of_clients[chan]: 
-		if clients!=connection: 
-			try: 
-				clients.send(message) 
-			except: 
-				clients.close() 
-
-				# if the link is broken, we remove the client 
-				remove(clients)
-
-#removes the client from the list of clients (in a specific room)
-def remove(connection, chan): 
-  if connection in list_of_clients[chan]: 
-    list_of_clients[chan].remove(connection) 
-
-# removes the client from the list of clients and the list of users
-# To use for users leaving the server
-def remove_from_server(connection, chan, name): 
-  if connection in list_of_clients[chan]: 
-    list_of_clients[chan].remove(connection) 
-  if name in liste_utilisateurs:
-    liste_utilisateurs.remove(name)
 
 #Sends a message when the server is in place
 print("Your server is up.")
