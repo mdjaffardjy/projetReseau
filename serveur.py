@@ -1,4 +1,10 @@
-# Python program to implement server side of chat room. 
+# -*- Serveur.py -*- 
+""" Python program to implement server side of multpiple chat rooms. 
+
+See README.md for futher informations on how to use this code.
+"""
+
+# -*- Libraries importation -*-
 import socket 
 import select 
 import sys
@@ -6,10 +12,17 @@ import errno
 from thread import *
 from collections import deque
 
+# -*- main code -*-
+# uses AF_INET domain and TCP protocol
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
 server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) 
 
 # checks whether IP address and port number have been provided 
+""" 
+sys.argv[0] = file name
+sys.argv[1] = IP address
+sys.argv[2] = port number
+"""
 if len(sys.argv) != 3: 
 	print("Entrez : script, addresse IP, numero de port")
 	exit() 
