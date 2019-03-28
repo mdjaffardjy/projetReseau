@@ -90,7 +90,7 @@ def broadcast(message, connection, chan):
 
 """
     **************************************************
- * Remove the old connection in one room and 
+ * Removes the old connection in one room and 
  create a new one in the chosen room
  * Parameters :
      -- conn : socket of the user who wants to change room
@@ -125,7 +125,7 @@ def connected_users():
     ****************************************************************
  * Removes the user from the list of clients (in a specific room)
  * Parameters :
-     -- connection : socket of user that needs to be removed
+     -- connection : socket object of user that needs to be removed
      -- chan : name of room
     ****************************************************************
 """  
@@ -139,7 +139,7 @@ def remove(connection, chan):
  * Removes the client from the list of clients and the list of users
   --- To use for users leaving the server
  * Parameters :
-     -- connection : socket of user that needs to be removed
+     -- connection : socket object of user that needs to be removed
      -- chan : name of room
      -- name : name of user that needs to be removed
     *****************************************************************
@@ -155,27 +155,26 @@ def remove_from_server(connection, chan, name):
     *****************************************************************
  * Function to execute at each new connection
  * Parameters :
-     -- conn : socket of the new connected user
+     -- conn : socket object of the new connected user
      -- addr : IP address of the new connected user
     *****************************************************************
 """  
 def clientthread(conn, addr): 
 	name=addr[0]
-	conn.send("Choissisez un nom :\n")
+	conn.send("Choissisez un nom :\n") # First, a user should choose a name
 	name=conn.recv(2048)[:-1]
-	while name in liste_utilisateurs :
+	while name in liste_utilisateurs : # Cannot choose an already chosen name 
 		conn.send("Nom deja utilise\n")
 		conn.send("Choissisez un nom :\n")
 		name=conn.recv(2048)[:-1]
 		
-	liste_utilisateurs.append(name)
+	liste_utilisateurs.append(name) # add the new user to the list of users
 	liste_utilisateurs.sort() 
 	
 	
-# Infos sur les utilisateurs du reseau 
-	
+# Then, informations on the state of the server are sent
 	# sends a message to the client whose user object is connected
-
+	# The user must choose a room
 	conn.send("Bienvenue dans le Hub !\nIl y a actuellement " + str(len(liste_utilisateurs)) + " utilisateurs connecte(s) : \n"+ connected_users() + "\nChoissisez un salon : \n")
 	liste_chan=''
 	for s in list_of_clients.keys() :
@@ -183,48 +182,48 @@ def clientthread(conn, addr):
 	conn.send(liste_chan)
 	
 	chan=conn.recv(2048)[:-1]
-	while chan not in list_of_clients.keys() :
+	while chan not in list_of_clients.keys() : # Only exisiting room can be chosen
 		conn.send("Salon inexistant\nChoisissez un salon : \n")
 		conn.send(liste_chan)
 		chan=conn.recv(2048)[:-1]
 
-	changerchan(conn, name, 'Hub', chan)
+	changerchan(conn, name, 'Hub', chan) # See l.278 : a user is first placed automatically in hub
   
-
 	while True: 
 		try: 
-			message = conn.recv(2048) 
+			message = conn.recv(2048) # In case a user send a message
 			if message: 
-		  #prints on the terminal :  message and address of the user
+		  #prints on the terminal :  message and name of the user
 				print("<" + name + "> " + message) 
-				if message.startswith('/') :
+				if message.startswith('/') : # In case the message is a special command
 					comm=message.split(' ')
 					if comm[0][1:] not in liste_commandes :
 						conn.send("Commande inconnue ou incomplete\n")
 					else :
-						if comm[0][1:]=='changernom' :
+						if comm[0][1:]=='changernom' :  #change name command
+						# parcoure la liste des utilsateurs
 							nv=comm[1].rstrip("\n")
 							if nv not in liste_utilisateurs :
-								liste_utilisateurs.remove(name)
-								liste_utilisateurs.append(nv)
+								liste_utilisateurs.remove(name) #remove the old name of the list of users
+								liste_utilisateurs.append(nv)  #add the new name to the list of users
 								broadcast(name+" a change son nom en "+nv, conn, chan)
 								name=nv
 							else :
 								conn.send("Nom deja utilise\n")
-						elif comm[0][1:]=='changersalon' :
+						elif comm[0][1:]=='changersalon' : #change room command
 							if comm[1].rstrip("\n") in list_of_clients.keys() :
 								changerchan(conn, name, chan, comm[1].rstrip("\n"))
 								chan=comm[1].rstrip("\n")
-						elif comm[0][1:]=='creersalon' :
+						elif comm[0][1:]=='creersalon' : #create room command
 							list_of_clients[comm[1][:-1]]=[]
 							list_of_conversations[comm[1][:-1]]=deque([],20)
 							changerchan(conn,name,chan,comm[1][:-1])
 							chan=comm[1][:-1]
-						elif comm[0][1:]=='listeutilisateurs\n' :
+						elif comm[0][1:]=='listeutilisateurs\n' : #list of users command
 							conn.send(connected_users())
-						elif comm[0][1:]=='help\n' :
+						elif comm[0][1:]=='help\n' : #help command
 							conn.send("Bienvenue dans l'aide du chat. Ici, tu peux naviguer dans plusieurs salons et discuter avec les personnes connectees a ce serveur.\n\nListe des commandes disponibles :\n-/changernom <nom> : permet de changer de nom dans le serveur\n-/changersalon <nom_du_salon> : permet de se deplacer dans le salon choisi\n-/creersalon <name_of_new_room> : cree un nouveau salon dans lequel tu est place directement. Si ce salon existe deja, tu seras place automatiquement dans le salon portant ce nom.\n-listeutilisateurs : permet d'obtenir les noms des utilisateurs connectes\n-help\n\nPour plus de details sur l'utilisation, veuillez vous referer au README.md\n")
-						elif comm[0][1:]=='exit\n' :
+						elif comm[0][1:]=='exit\n' : #exit command
 						  conn.send("Etes vous surs de vouloir quitter ? [y/n]")
 						  resp = conn.recv(2048)
 						  while resp!='y\n' and resp!='n\n':
@@ -276,14 +275,13 @@ while True:
 	socket object for that user, and IP address of the client"""
 	conn, addr = server.accept()
 
-	"""Maintains a list of clients in the chatroom"""
+	#Maintains a list of clients in the chatroom
 	list_of_clients['Hub'].append(conn)
 
 	# prints the address of the user that just connected 
 	print(addr[0] + " connected")
 
-	# creates and individual thread for every user 
-	# that connects 
+	# creates and individual thread for every user that connects 
 	start_new_thread(clientthread,(conn,addr))	 
 
 conn.close() 
