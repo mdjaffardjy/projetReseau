@@ -116,7 +116,8 @@ def clientthread(conn, addr):
 						    conn.send("Etes vous surs de vouloir quitter ? [y/n]")
 						    resp = conn.recv(2048)
 						  if resp == 'y\n':
-						    conn.close()
+						    conn.send("DisconnectNow")
+						    #conn.close()
 						    remove_from_server(conn, chan, name)
 						  else:
 						    continue
@@ -177,14 +178,14 @@ def remove_from_server(connection, chan, name):
 print("Your server is up.")
 
 
-while True: 
+while True:
 
 	"""Accepts a connection request and stores two parameters, 
 	socket object for that user, and IP address of the client"""
-	conn, addr = server.accept() 
+	conn, addr = server.accept()
 
 	"""Maintains a list of clients in the chatroom"""
-	list_of_clients['Hub'].append(conn) 
+	list_of_clients['Hub'].append(conn)
 
 	# prints the address of the user that just connected 
 	print(addr[0] + " connected")

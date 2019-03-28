@@ -11,9 +11,8 @@ IP_address = str(sys.argv[1])
 Port = int(sys.argv[2]) 
 server.connect((IP_address, Port)) 
 
-
-
-while True: 
+message=''
+while message!="DisconnectNow": 
 
 	# maintains a list of possible input streams 
 	sockets_list = [sys.stdin, server] 
@@ -33,6 +32,7 @@ while True:
 			server.send(message) 
 			sys.stdout.write("<You>") 
 			sys.stdout.write(message) 
-			sys.stdout.flush() 
+			sys.stdout.flush()
+			
 server.close() 
 
