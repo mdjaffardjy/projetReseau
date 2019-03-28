@@ -1,10 +1,10 @@
-# -*- Serveur.py -*- 
+# *************************** -*- Serveur.py -*- ******************************
 """ Python program to implement server side of multpiple chat rooms. 
 
 See README.md for futher informations on how to use this code.
 """
 
-# -*- Libraries importation -*-
+# ********************** -*- Libraries importation -*- ************************
 import socket 
 import select 
 import sys
@@ -13,9 +13,10 @@ from thread import *
 from collections import deque
 
 
-# ************************* -*- main code -*- *********************************
+# **************************** -*- main code -*- ******************************
 
-# uses AF_INET domain and TCP protocol
+# socket creation
+#  -- uses AF_INET domain and TCP protocol
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
 server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) 
 
@@ -42,41 +43,62 @@ server.bind((IP_address, Port))
 #listens for "100" active connections
 server.listen(100) 
 
-# Global variables
+# -*- Global variables -*-
 """ 
-    ****************************************************
+    *********************************************************
  * list_of_clients : map of connections per room. 
        --- key : name of room ; 
-       --- value : list of connections
+       --- value : list of sockets
  * liste_utilisateurs : list of connected user's names. 
  * liste_commandes : list of special commands
  * list_of_conversations : map of messages per room. 
        --- key : name of room
-       --- value : deque of a list of messages and size
-    ****************************************************
+       --- value : deque of a list of messages and size = 20
+     We keep at maximum 20 messages 
+    *********************************************************
 """
 
-list_of_clients = {'Hub' : [], 'Blabla' : []}
+list_of_clients = {'Hub' : [], 'Presentation' : [], 'Blabla' : []}
 
 liste_utilisateurs=[]
 
 liste_commandes = ['changernom', 'changersalon', 'creersalon', 'listeutilisateurs\n', 'help\n', 'exit\n']
-#list of the the list of the last messages for all conversations. We keep a maximum of 20 messages
+
 list_of_conversations = {'Hub' : deque([], 20), 'Blabla' : deque([], 20)} 
 
+# -*- Functions -*-
 
-#Broadcast the message to all clients except the one who sent the message
+
+"""
+    *************************************************************************
+ * Broadcast the message to all clients except the one who sent the message
+ * Parameters :
+     -- message : message to send
+     -- connection : socket of user sending message
+     -- chan : name of room
+    *************************************************************************
+"""
 def broadcast(message, connection, chan): 
 	for clients in list_of_clients[chan]: 
 		if clients!=connection: 
 			try: 
 				clients.send(message) 
-			except: 
+			except: # if the link is broken, we remove the client
 				clients.close() 
+				remove(clients)  
 
-				# if the link is broken, we remove the client 
-				remove(clients)
 
+"""
+    **************************************************
+ * Remove the old connection in one room and 
+ create a new one in the chosen room
+ * Parameters :
+     -- conn : socket of the user who wants to change room
+     -- name : name of the user that appears on terminal
+     -- ancien : old room
+     -- nouveau : new room
+    **************************************************
+"""
 def changerchan(conn, name, ancien, nouveau) :
 	remove(conn, ancien)
 	list_of_clients[nouveau].append(conn)
@@ -85,26 +107,58 @@ def changerchan(conn, name, ancien, nouveau) :
 		conn.send(message+"\n")
 	broadcast(name+" est entre dans le salon", conn, nouveau)
 
+
+"""
+    *********************************************
+ * Returns a display of users present on server
+    *********************************************
+"""
 def connected_users():
   res =""
   for s in liste_utilisateurs:
 	  res = res +" - " + s + "\n"
   res=res+" sont actuellement connectes\n"
   return res
-  
-#removes the client from the list of clients (in a specific room)
+
+
+"""
+    ****************************************************************
+ * Removes the user from the list of clients (in a specific room)
+ * Parameters :
+     -- connection : socket of user that needs to be removed
+     -- chan : name of room
+    ****************************************************************
+"""  
 def remove(connection, chan): 
   if connection in list_of_clients[chan]: 
     list_of_clients[chan].remove(connection) 
 
-# removes the client from the list of clients and the list of users
-# To use for users leaving the server
+
+"""
+    *****************************************************************
+ * Removes the client from the list of clients and the list of users
+  --- To use for users leaving the server
+ * Parameters :
+     -- connection : socket of user that needs to be removed
+     -- chan : name of room
+     -- name : name of user that needs to be removed
+    *****************************************************************
+"""  
 def remove_from_server(connection, chan, name): 
   if connection in list_of_clients[chan]: 
     list_of_clients[chan].remove(connection) 
   if name in liste_utilisateurs:
     liste_utilisateurs.remove(name)
 
+
+"""
+    *****************************************************************
+ * Function to execute at each new connection
+ * Parameters :
+     -- conn : socket of the new connected user
+     -- addr : IP address of the new connected user
+    *****************************************************************
+"""  
 def clientthread(conn, addr): 
 	name=addr[0]
 	conn.send("Choissisez un nom :\n")
@@ -169,7 +223,7 @@ def clientthread(conn, addr):
 						elif comm[0][1:]=='listeutilisateurs\n' :
 							conn.send(connected_users())
 						elif comm[0][1:]=='help\n' :
-							conn.send("Bienvenue dans l'aide du chat. Ici, tu peux naviguer dans plusieurs salons et discuter avec les personnes connectees a ce serveur.\n\nListe des commandes disponibles :\n-/changernom <nom> : permet de changer de nom dans le serveur\n-/changersalon <nom_du_salon> : permet de se deplacer dans le salon choisi\n-listeutilisateurs : permet d'obtenir les noms des utilisateurs connectes\n-help\n\nPour plus de details sur l'utilisation, veuillez vous referer au README.md\n")
+							conn.send("Bienvenue dans l'aide du chat. Ici, tu peux naviguer dans plusieurs salons et discuter avec les personnes connectees a ce serveur.\n\nListe des commandes disponibles :\n-/changernom <nom> : permet de changer de nom dans le serveur\n-/changersalon <nom_du_salon> : permet de se deplacer dans le salon choisi\n-/creersalon <name_of_new_room> : cree un nouveau salon dans lequel tu est place directement. Si ce salon existe deja, tu seras place automatiquement dans le salon portant ce nom.\n-listeutilisateurs : permet d'obtenir les noms des utilisateurs connectes\n-help\n\nPour plus de details sur l'utilisation, veuillez vous referer au README.md\n")
 						elif comm[0][1:]=='exit\n' :
 						  conn.send("Etes vous surs de vouloir quitter ? [y/n]")
 						  resp = conn.recv(2048)
@@ -208,6 +262,8 @@ def clientthread(conn, addr):
 		    print "socket error", e
 		  conn.close()
 		  break
+
+# ***************************** end functions *********************************
 
 
 #Sends a message when the server is in place
