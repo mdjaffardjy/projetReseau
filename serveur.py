@@ -1,7 +1,8 @@
 # Python program to implement server side of chat room. 
 import socket 
 import select 
-import sys 
+import sys
+import errno 
 from thread import *
 from collections import deque
 
@@ -28,7 +29,7 @@ list_of_clients = {'Hub' : [], 'Blabla' : []}
 
 liste_utilisateurs=[]
 
-liste_commandes = ['changernom', 'changersalon', 'creersalon', 'listeutilisateurs\n']
+liste_commandes = ['changernom', 'changersalon', 'creersalon', 'listeutilisateurs\n', 'help\n', 'exit\n']
 #list of the the list of the last messages for all conversations. We keep a maximum of 20 messages
 list_of_conversations = {'Hub' : deque([], 20), 'Blabla' : deque([], 20)} 
 
@@ -41,6 +42,13 @@ def changerchan(conn, name, ancien, nouveau) :
 		conn.send(message+"\n")
 	broadcast(name+" est entre dans le salon", conn, nouveau)
 
+def connected_users(liste_utilisateurs):
+  res =""
+  for s in liste_utilisateurs:
+	  res = res +" - " + s + "\n"
+  res=res+" sont actuellement connectes\n"
+  return res
+
 def clientthread(conn, addr): 
 	name=addr[0]
 	conn.send("Choissisez un nom :\n")
@@ -51,12 +59,14 @@ def clientthread(conn, addr):
 		name=conn.recv(2048)[:-1]
 		
 	liste_utilisateurs.append(name)
+	liste_utilisateurs.sort() 
+	
 	
 # Infos sur les utilisateurs du reseau 
 	
 	# sends a message to the client whose user object is connected
 
-	conn.send("Bienvenue dans le Hub !\nIl y a actuellement " + str(len(liste_utilisateurs)) + " utilisateurs connectes. \nChoissisez un salon : \n")
+	conn.send("Bienvenue dans le Hub !\nIl y a actuellement " + str(len(liste_utilisateurs)) + " utilisateurs connecte(s) : \n"+ connected_users(liste_utilisateurs) + "\nChoissisez un salon : \n")
 	liste_chan=''
 	for s in list_of_clients.keys() :
 		liste_chan+=s+';'
@@ -95,10 +105,21 @@ def clientthread(conn, addr):
 							if comm[1].rstrip("\n") in list_of_clients.keys() :
 								changerchan(conn, name, chan, comm[1].rstrip("\n"))
 								chan=comm[1].rstrip("\n")
-
 						elif comm[0][1:]=='listeutilisateurs\n' :
-							for u in liste_utilisateurs :
-								conn.send(u+"\n")
+							conn.send(connected_users(liste_utilisateurs))
+						elif comm[0][1:]=='help\n' :
+							conn.send("Bienvenue dans l'aide du chat. Ici, tu peux naviguer dans plusieurs salons et discuter avec les personnes connectees a ce serveur.\n\nListe des commandes disponibles :\n-/changernom <nom> : permet de changer de nom dans le serveur\n-/changersalon <nom_du_salon> : permet de se deplacer dans le salon choisi\n-listeutilisateurs : permet d'obtenir les noms des utilisateurs connectes\n-help\n\nPour plus de details sur l'utilisation, veuillez vous referer au README.md\n")
+						elif comm[0][1:]=='exit\n' :
+						  conn.send("Etes vous surs de vouloir quitter ? [y/n]")
+						  resp = conn.recv(2048)
+						  while resp!='y\n' and resp!='n\n':
+						    conn.send("Etes vous surs de vouloir quitter ? [y/n]")
+						    resp = conn.recv(2048)
+						  if resp == 'y\n':
+						    conn.close()
+						    remove_from_server(conn, chan, name)
+						  else:
+						    continue
 				else :
 				# Calls broadcast function to send message to all and saves the message in the list
 					message_to_send = "<" + name + "> " + message 
@@ -110,12 +131,22 @@ def clientthread(conn, addr):
 
 			else: 
 				#remove connection when it's broken
-				remove(conn, chan) 
+				remove_from_server(conn, chan, name) 
 				broadcast(name+" a quitte le salon", conn, chan)
 				liste_utilisateurs.remove(name)
 				break
-		except: 
-			continue
+		except socket.error, e:
+		  if isinstance(e.args, tuple):
+		    print "errno is %d" %e[0]
+		    if e[0] == errno.EPIPE:
+		    #remote peer disconnected
+		      print "Detected connection disconnect"
+		    else:
+		      pass
+		  else:
+		    print "socket error", e
+		  conn.close()
+		  break
 
 #Broadcast the message to all clients except the one who sent the message
 def broadcast(message, connection, chan): 
@@ -127,12 +158,20 @@ def broadcast(message, connection, chan):
 				clients.close() 
 
 				# if the link is broken, we remove the client 
-				remove(clients) 
+				remove(clients)
 
-#removes the client from the list of clients
+#removes the client from the list of clients (in a specific room)
 def remove(connection, chan): 
-	if connection in list_of_clients[chan]: 
-		list_of_clients[chan].remove(connection) 
+  if connection in list_of_clients[chan]: 
+    list_of_clients[chan].remove(connection) 
+
+# removes the client from the list of clients and the list of users
+# To use for users leaving the server
+def remove_from_server(connection, chan, name): 
+  if connection in list_of_clients[chan]: 
+    list_of_clients[chan].remove(connection) 
+  if name in liste_utilisateurs:
+    liste_utilisateurs.remove(name)
 
 #Sends a message when the server is in place
 print("Your server is up.")
