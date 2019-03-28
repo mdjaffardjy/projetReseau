@@ -69,13 +69,9 @@ WARNING : No special command can be used before this step.
 
 
 ## Authors
-* **Olivia Brunet** - *Initial work* - [GitHub](https://github.com/OliviaBnt)
-
-* **Marine Djaffardjy** - *Initial work* - [GitHub](https://github.com/mdjaffardjy)
-
-* **Théophile Moreal de Brevans** - *Initial work* - [GitHub](https://github.com/MorealDeBrevans/)
-
-See also the list of [contributors](https://github.com/mdjaffardjy/projetReseau) who participated in this project.
+* **Olivia Brunet** - *Initial work* 
+* **Marine Djaffardjy** - *Initial work*
+* **Théophile Moreal de Brevans** - *Initial work*
 
 ## License
 
