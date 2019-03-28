@@ -53,15 +53,12 @@ WARNING : No special command can be used before this step.
 
 ##### Special commands
 * ``` /changernom <nom> ``` : enables to change the user's own name. Warning : no space allowed ; no already used name can be taken (except if the user using this name left the server).
-
 Example : ``` /changernom Fifi ```
 
 * ``` /changersalon <name_of_room> ``` : enables to change room amongst existing rooms.
-
 Example : ``` /changersalon Hub ```
 
-* ``` /creersalon <name_of_new_room> ``` : create a new chat room named after *name_of_room*. No space allowed. Two chat rooms cannot have the same name.
-
+* ``` /creersalon <name_of_new_room> ``` : create a new chat room named after *name_of_room*. No space allowed. If the name of an exisiting room is typed, sends the user to the named room. 
 Example : ``` /creersalon Forum ```
 
 * ``` /listeutilisateurs ``` : prints the list of connected users in the terminal window.
