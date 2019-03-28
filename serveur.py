@@ -112,6 +112,7 @@ def clientthread(conn, addr):
 				#remove connection when it's broken
 				remove(conn, chan) 
 				broadcast(name+" a quitte le salon", conn, chan)
+				liste_utilisateurs.remove(name)
 				break
 		except: 
 			continue
