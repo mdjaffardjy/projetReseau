@@ -4,6 +4,7 @@ import select
 import sys 
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
+server.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
 if len(sys.argv) != 3: 
 	print("Entrez : script, addresse IP, numero de port")
 	exit() 

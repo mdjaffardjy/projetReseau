@@ -18,7 +18,7 @@ from collections import deque
 # socket creation
 #  -- uses AF_INET domain and TCP protocol
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
-server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) 
+server.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
 
 # checks whether IP address and port number have been provided 
 """ 
@@ -38,7 +38,7 @@ IP_address = str(sys.argv[1]) #sets IP address
 Port = int(sys.argv[2]) #sets port number
 
 #The client must be aware of the IP address and port number parameters 
-server.bind((IP_address, Port)) 
+server.bind((, Port)) 
 
 #listens for "100" active connections
 server.listen(100) 
