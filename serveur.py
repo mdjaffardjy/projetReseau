@@ -38,7 +38,7 @@ IP_address = str(sys.argv[1]) #sets IP address
 Port = int(sys.argv[2]) #sets port number
 
 #The client must be aware of the IP address and port number parameters 
-server.bind((, Port)) 
+server.bind(('', Port)) 
 
 #listens for "100" active connections
 server.listen(100) 
