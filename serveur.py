@@ -64,7 +64,7 @@ liste_utilisateurs=[]
 
 liste_commandes = ['changernom', 'changersalon', 'creersalon', 'listeutilisateurs\n', 'help\n', 'exit\n']
 
-list_of_conversations = {'Hub' : deque([], 20), 'Blabla' : deque([], 20)} 
+list_of_conversations = {'Hub' : deque([], 20), 'Presentation' : deque([], 20), 'Blabla' : deque([], 20)} 
 
 # -*- Functions -*-
 
