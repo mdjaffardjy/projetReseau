@@ -1,6 +1,8 @@
 # *************************** -*- Serveur.py -*- ******************************
 """ Python program to implement server side of multpiple chat rooms. 
 
+Execute using Python2.7
+
 See README.md for futher informations on how to use this code.
 """
 
@@ -215,10 +217,13 @@ def clientthread(conn, addr):
 								changerchan(conn, name, chan, comm[1].rstrip("\n"))
 								chan=comm[1].rstrip("\n")
 						elif comm[0][1:]=='creersalon' : #create room command
-							list_of_clients[comm[1][:-1]]=[]
-							list_of_conversations[comm[1][:-1]]=deque([],20)
-							changerchan(conn,name,chan,comm[1][:-1])
-							chan=comm[1][:-1]
+						  if comm[1][:-1] not in list_of_clients.keys() :
+							  list_of_clients[comm[1][:-1]]=[]
+							  list_of_conversations[comm[1][:-1]]=deque([],20)
+							  changerchan(conn,name,chan,comm[1][:-1])
+							  chan=comm[1][:-1]
+						  else:
+							  conn.send("Ce salon existe deja")
 						elif comm[0][1:]=='listeutilisateurs\n' : #list of users command
 							conn.send(connected_users())
 						elif comm[0][1:]=='help\n' : #help command
