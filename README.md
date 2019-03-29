@@ -39,7 +39,7 @@ Once the server is set, users that want to connect to the server should use the 
 ```python
 python client.py <IP_address> <port>
 ```
-> Be aware that the users connect to the same localhost and port as the ones of the server !
+> Be aware that the users connect to the same IP address and port as the ones of the server !
 > If the client is correctly connected, you will see a written confirmation in the terminal : "Choisissez un nom".
 
 #### Commands and use of the chat-room
