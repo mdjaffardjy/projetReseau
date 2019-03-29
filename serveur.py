@@ -18,7 +18,7 @@ from collections import deque
 # socket creation
 #  -- uses AF_INET domain and TCP protocol
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
-server.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
+server.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
 # checks whether IP address and port number have been provided 
 """ 
