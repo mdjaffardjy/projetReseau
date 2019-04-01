@@ -10,6 +10,7 @@ Welcome to Project666's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   intro
 
 
 Indices and tables
