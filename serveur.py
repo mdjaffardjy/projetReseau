@@ -71,16 +71,18 @@ list_of_conversations = {'Hub' : deque([], 20), 'Presentation' : deque([], 20), 
 # -*- Functions -*-
 
 
-"""
-    *************************************************************************
- * Broadcast the message to all clients except the one who sent the message
- * Parameters :
-     -- message : message to send
-     -- connection : socket of user sending message
-     -- chan : name of room
-    *************************************************************************
-"""
 def broadcast(message, connection, chan): 
+"""Broadcast the message to all clients except the one who sent the message.
+
+Parameters
+----------
+message : str
+  message to send.
+connection : socket
+  socket of user sending message.
+chan : str
+  name of room.
+"""
 	for clients in list_of_clients[chan]: 
 		if clients!=connection: 
 			try: 
@@ -90,18 +92,20 @@ def broadcast(message, connection, chan):
 				remove(clients)  
 
 
-"""
-    **************************************************
- * Removes the old connection in one room and 
- create a new one in the chosen room
- * Parameters :
-     -- conn : socket of the user who wants to change room
-     -- name : name of the user that appears on terminal
-     -- ancien : old room
-     -- nouveau : new room
-    **************************************************
-"""
 def changerchan(conn, name, ancien, nouveau) :
+"""Removes the old connection in one room and create a new one in the chosen room.
+ 
+Parameters
+----------
+conne : socket
+	socket of the user who wants to change room.
+name : str
+	name of the user that appears on terminal.
+ancien : str
+	old room.
+nouveau : str
+	new room.
+"""
 	remove(conn, ancien)
 	list_of_clients[nouveau].append(conn)
 	conn.send("Bienvenue dans "+nouveau+'\n')
@@ -110,12 +114,14 @@ def changerchan(conn, name, ancien, nouveau) :
 	broadcast(name+" est entre dans le salon", conn, nouveau)
 
 
-"""
-    *********************************************
- * Returns a display of users present on server
-    *********************************************
-"""
 def connected_users():
+"""Returns a display of users present on server.
+
+Returns
+-------
+str
+	A string listing all connected users.
+"""
   res =""
   for s in liste_utilisateurs:
 	  res = res +" - " + s + "\n"
@@ -123,45 +129,47 @@ def connected_users():
   return res
 
 
-"""
-    ****************************************************************
- * Removes the user from the list of clients (in a specific room)
- * Parameters :
-     -- connection : socket object of user that needs to be removed
-     -- chan : name of room
-    ****************************************************************
-"""  
 def remove(connection, chan): 
+"""Removes the user from the list of clients (in a specific room)
+
+Parameters
+----------
+connection : socket
+	socket object of user that needs to be removed
+chan : str
+	name of room
+"""  
   if connection in list_of_clients[chan]: 
     list_of_clients[chan].remove(connection) 
 
 
-"""
-    *****************************************************************
- * Removes the client from the list of clients and the list of users
-  --- To use for users leaving the server
- * Parameters :
-     -- connection : socket object of user that needs to be removed
-     -- chan : name of room
-     -- name : name of user that needs to be removed
-    *****************************************************************
-"""  
 def remove_from_server(connection, chan, name): 
+"""Removes the client from the list of clients and the list of users --- To use for users leaving the server
+
+Parameters
+----------
+connection : socket
+	socket object of user that needs to be removed
+chan : str
+	name of room
+name : str
+	name of user that needs to be removed
+"""  
   if connection in list_of_clients[chan]: 
     list_of_clients[chan].remove(connection) 
   if name in liste_utilisateurs:
     liste_utilisateurs.remove(name)
 
 
-"""
-    *****************************************************************
- * Function to execute at each new connection
- * Parameters :
-     -- conn : socket object of the new connected user
-     -- addr : IP address of the new connected user
-    *****************************************************************
-"""  
 def clientthread(conn, addr): 
+"""Manages the connection of a specific user
+Parameters
+----------
+conn : socket
+	socket object of the new connected user
+addr : str
+	IP address of the new connected user
+"""  
 	name=addr[0]
 	conn.send("Choissisez un nom :\n") # First, a user should choose a name
 	name=conn.recv(2048)[:-1]
